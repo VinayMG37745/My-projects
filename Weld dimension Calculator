@@ -1,0 +1,69 @@
+#angle plate calculations
+from random import randint
+print("               ++++++")
+print("               +         +")
+print("               +         +")
+print("     H        +         +")
+print("++++++$          +")
+print("+ angle   +          +")
+print("+ plate    +          +")
+print("++++     +          +")
+print("       +     + W      +")
+print("       +     +          +")
+print("       +     +          +")
+print("       +     +          +")
+print("       +++$           +")
+print("          T  +          +")
+print("              +          +")
+print("              ++++++")
+
+print("Dollar sign indicates weld")
+h = int(input("Enter Height of angle plate (H): "))
+w = int(input("Enter Width of angle plate (W): "))
+t = int(input("Enter thickness of the angle plate (T): "))
+f = float(input("Enter force(in kN): "))
+ow = float(input("Enter allowable shear stress(in N/mm2)(not given enter 0): "))
+
+def electrode():
+    chk = randint(0,1)
+    if chk == 0:
+        print("Assuming MS bare electrode")
+        x = 78
+        return x
+    else:
+         print("Assuming MS coated electrode")
+         x = 96
+         return x
+
+def centre_of_gravity(H,W,T):
+    A1 = W * T
+    A2 = (H - T) * T
+    Y1 = T/2
+    Y2 = T + ((H - T)/2)
+    x = A1*Y1 + A2*Y2
+    y = A1 + A2
+    cg = round(x/y , 3)
+    return cg
+
+def length(e1,f,tow,w,t,h):
+    l2n = 1.414 * f * 1000 * e1
+    l2d = tow * w * t
+    L2 = round(l2n/l2d,3)
+    e2 = h - e1
+    l1n = 1.414 * f * 1000 * e2
+    l1d = tow * w * t
+    L1 = round(l1n/l1d,3)
+    print("The length of weld L1 is",L1,"mm")
+    print("The length of weld L2 is",L2,"mm")
+    print("Assuming there is an improper deposition of weld, additional 6mm allowance is added at ends")
+    print("The final length of weld L1 is",L1+12,"mm")
+    print("The final length of weld L2 is",L2+12,"mm")
+
+e1 = centre_of_gravity(h,w,t)
+if ow == 0:
+    tow = electrode()
+else:
+    tow = ow
+print("the center of gravity is",centre_of_gravity(h,w,t),"mm")
+
+length(e1,f,tow,w,t,h)
