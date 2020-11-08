@@ -1,0 +1,118 @@
+# copy and paste this Python code in python editor 
+# save the file
+# run the code
+
+import math
+from random import randint
+# co-efficients of k table 5.12b
+K = [0,1.75,3.50,4.63,5.52,6]
+def typeofjoint():
+    chk = randint(0,1)
+    if chk == 0:
+        print("Consider chain rivetting with equal thickness of strap plates")
+        print("\n")
+    else:
+        print("Consider zig-zag rivetting with equal thickness of strap plates")
+        print("\n")
+    return chk
+
+def thickness(D,P,n,st):
+    t = (P*D)/(2*st*n)
+    x = str(round(t,3))
+    y = x.split(".")
+    comp = int(y[1])
+    if comp < 500:
+        return round(t)+1
+    if comp > 500:
+        return round(t)
+
+def diameter(t):
+    if t > 8:
+        x = 6.2 * math.sqrt(t)
+        g = str(round(x,3))
+        h = g.split(".")
+        comp = int(h[1])
+        if comp < 500:
+            return round(x)+1
+        if comp > 500:
+            return round(x)
+
+def pitch(d,t,st,ss,n,r):
+    A = (math.pi * d * d)/4
+    x = t * st
+    y = (1.875 * A * ss * r) / x #3 or 2 yet to be dicided
+    p = round(y + d , 3)
+    return p
+
+def maxpitch(t,r):
+    pmax = round(K[r] * t + 41 , 3)
+    return pmax
+
+def traverse_pitch(x,d,p):
+    if x == 0:
+        return 2 * d
+    else:
+        f = 0.33 * p + 0.67 * d
+        return round(f,3)
+
+def efficiency(p,d,t,st,ss,sc,n):
+    if st != 0:
+        pt1 = (p - d) * t * st
+        pt = round(pt1 , 3)
+        print("Tearing strength = ",pt,"N")
+
+    if ss != 0:
+        ps1 = 1.875 * ((math.pi*d*d)/4) * ss * n
+        ps = round(ps1 , 3)
+        print("Shearing strength = ",ps,"N")
+
+    if sc != 0:
+        pc1 = d * t * sc * n
+        pc = round(pc1 , 3)
+        print("Crushing strength = ",pc,"N")
+
+    load1 = p * t * st
+    load = round(load1 , 3)
+    print("\n")
+    
+    if sc != 0:
+        eff1 = (min(pt,ps,pc)/load) * 100
+        return eff1
+    if sc == 0:
+        eff2 = (min(pt,ps)/load) * 100
+        return eff2
+
+
+BDIA = float(input("Enter boiler diameter(in mm):  "))
+STEAMPRE = float(input("Enter steam pressure(in N/mm2):  "))
+EFFJOINT = float(input("Enter efficiency of joint:  "))
+TEN_STRESS = float(input("Enter tensile stress(in N/mm2):  "))
+CRU_STRESS = float(input("Enter crushing stress(Zero if not given)(in N/mm2):  "))
+SHE_STRESS =float(input("Enter shearing stress(in N/mm2):  "))
+NUMOFRIVETS = int(input("Enter number of rivets per pitch: "))
+
+tra = typeofjoint()
+a = thickness(BDIA,STEAMPRE,EFFJOINT,TEN_STRESS)
+b = diameter(a)
+c = pitch(b,a,TEN_STRESS,SHE_STRESS,EFFJOINT,NUMOFRIVETS)
+d = maxpitch(a,NUMOFRIVETS)
+e = min(c,d)
+eff = efficiency(e,b,a,TEN_STRESS,SHE_STRESS,CRU_STRESS,NUMOFRIVETS)
+print("thickness of the boiler shell = ",a,"mm")
+print("Diameter of the rivet = ",b,"mm")
+print("diameter of rivet hole = ",b+1,"mm")
+print("\n")
+print("pitch = ",c,"mm")
+print("maximum pitch = ",d,"mm")
+print("Pitch that has to be considered = ",e,"mm")
+print("\n")
+print("Traverse pitch = ",traverse_pitch(tra,b,e),"mm")
+print("Thickness of strap plates t1 and t2 = ",round(0.625*a,3),"mm")
+print("Margin to be allocated = ",round(1.5*b,3),"mm")
+print("\n")
+print("Efficiency of joint:  ",round(eff,3),"%")
+geff = EFFJOINT * 100
+if (round(eff,3) > geff-5 and round(eff,3) < geff):
+    print("\n")
+    print("Here the calculated efficiency is very close to the given efficiency")
+    print("Therefore design is SASTISFACTORY")
